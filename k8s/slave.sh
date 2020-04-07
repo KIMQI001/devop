@@ -20,6 +20,7 @@ EOF
 apt-get update
 # 下载 kubectl，kubeadm以及 kubelet
 apt-get install -y kubelet kubeadm kubectl
+wait
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
