@@ -18,4 +18,6 @@ EOF
 apt-get update
 # 下载 kubectl，kubeadm以及 kubelet
 apt-get install -y kubelet kubeadm kubectl
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
 echo "please run the kube join"
