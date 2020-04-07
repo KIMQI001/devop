@@ -5,7 +5,9 @@ if  [ ! -n "${1}" ] ;then
 else
   echo "the config you input are ${1}"
 fi
-
+echo -e "${1}" >> /etc/hosts
+cp ./daemon.json /etc/docker/
+sudo systemctl daemon-reload && sudo systemctl restart docker
 # 使得 apt 支持 ssl 传输
 apt-get update && apt-get install -y apt-transport-https
 # 下载 gpg 密钥
@@ -18,6 +20,9 @@ EOF
 apt-get update
 # 下载 kubectl，kubeadm以及 kubelet
 apt-get install -y kubelet kubeadm kubectl
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 echo "please run the kube join"
