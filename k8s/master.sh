@@ -14,17 +14,19 @@ else
 fi
 
 echo -e "${1}" >> /etc/hosts
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted" > /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial-updates main restricted" >> /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial universe" >> /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial-updates universe" >> /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial multiverse" >> /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial-updates multiverse" >> /etc/apt/sources.list
-echo "deb http://mirrors.aliyun.com/ubuntu/ xenial-backports main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb https://mirrors.aliyun.com/kubernetes/apt kubernetes-xenial main" >> /etc/apt/sources.list
-apt-get install docker.io
-wait
-apt-get update && apt-get install -y kubelet kubeadm kubectl --allow-unauthenticated
+# 使得 apt 支持 ssl 传输
+apt-get update && apt-get install -y apt-transport-https
+# 下载 gpg 密钥
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+# 添加 k8s 镜像源
+cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+EOF
+# 更新源列表
+apt-get update
+# 下载 kubectl，kubeadm以及 kubelet
+apt-get install -y kubelet kubeadm kubectl
+
 kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address="${2}"
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
